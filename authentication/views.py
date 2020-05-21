@@ -6,11 +6,8 @@ from rest_framework import status
 class UserAuthorization(APIView):
 
     def post(self, request):
-        print(dir(request))
         username = request.data.get('login', None)
         password = request.data.get('password', None)
-        print(username)
-        print(password)
         user = authenticate(request, username=username, password=password)
         if user is not None:
             return Response({"status": "Ok"}, status=status.HTTP_200_OK)
