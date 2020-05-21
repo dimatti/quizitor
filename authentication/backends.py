@@ -6,8 +6,8 @@ class EmailAuthBackend:
 
     def authenticate(self, request, username=None, email=None, password=None, force_auth=False, user_ip=None):
         try:
-            user = self.UserModel.get(email=username if username else email)
-
+            user = self.UserModel.objects.get(email=username if username else email)
+            print(user.check_password(password))
             if user.check_password(password) or force_auth:
                 return user
             else:
