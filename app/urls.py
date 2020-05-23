@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', UserAuthorization.as_view()),
     path('users/', UserView.as_view()),
+    path('users/<int:pk>', UserView.as_view()),
 ]
