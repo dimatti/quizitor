@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path
 
 from authentication.views import UserAuthorization
+from users.views import UserView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', UserAuthorization.as_view())
+    path('login/', UserAuthorization.as_view()),
+    path('users/', UserView.as_view()),
 ]
