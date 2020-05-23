@@ -6,9 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 class User(AbstractBaseUser):
     username = models.TextField(verbose_name=_('Username'), max_length=255, unique=True)
     email = models.EmailField(verbose_name=_('Email'), max_length=255, unique=True)
-    name = models.TextField(verbose_name=_('Name'), max_length=255, unique=True)
-    surname = models.TextField(verbose_name=_('Surname'), max_length=255, unique=True)
-    current_city = models.TextField(verbose_name=_('City'), max_length=255, unique=True)
+    name = models.TextField(verbose_name=_('Name'), max_length=255)
+    surname = models.TextField(verbose_name=_('Surname'), max_length=255)
+    current_city = models.TextField(verbose_name=_('City'), max_length=255)
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
     is_staff = models.BooleanField(verbose_name=_('Is staff'), default=False)
