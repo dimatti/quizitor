@@ -45,6 +45,7 @@ APPS = [
 PROJECT_APPS = [
     'authentication',
     'users',
+    'games',
 ]
 
 INSTALLED_APPS = PROJECT_APPS + APPS
