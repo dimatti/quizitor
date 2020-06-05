@@ -6,6 +6,7 @@ import pyproj
 
 DISTANCE = 10.0
 
+
 class Point(models.Model):
     lat = models.FloatField(verbose_name=_('Point Latitude'))
     lon = models.FloatField(verbose_name=_('Point Longitude'))
@@ -41,6 +42,8 @@ class Result(models.Model):
     time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
     user_answer = models.TextField(verbose_name=_('User Answer'), null=True)
     is_answered_correctly = models.BooleanField(verbose_name=_('Is Answered Correctly'), default=False)
+    is_tip_used = models.BooleanField(verbose_name=_('Is Tip Used'), default=False)
+    is_help_used = models.BooleanField(verbose_name=_('Is Help Used'), default=False)
     is_checked_correctly = models.BooleanField(verbose_name=_('Is Checked Correctly'), default=False)
 
 
