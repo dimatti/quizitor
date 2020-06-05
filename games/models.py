@@ -2,6 +2,9 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 # Create your models here.
 
+import pyproj
+
+DISTANCE = 10.0
 
 class Point(models.Model):
     lat = models.FloatField(verbose_name=_('Point Latitude'))
@@ -10,6 +13,17 @@ class Point(models.Model):
     question = models.TextField(verbose_name=_('Question'), null=True)
     answer = models.TextField(verbose_name=_('Answer'), null=True)
     tip = models.TextField(verbose_name=_('Tip'), null=True)
+
+    def get_distance(self, lat_user, lon_user):
+        geodesic = pyproj.Geod(ellps='WGS84')
+        return geodesic.inv(lat_user, lon_user, self.lat, self.lon)
+
+    def check_point(self, lat_user, lon_user):
+        _, _, distance = self.get_distance(lat_user, lon_user)
+        return abs(distance) < DISTANCE
+
+    def check_answer(self, user_answer):
+        return user_answer.to_lower() == self.answer
 
 
 class Game(models.Model):
