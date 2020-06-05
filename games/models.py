@@ -24,7 +24,7 @@ class Point(models.Model):
         return abs(distance) < DISTANCE
 
     def check_answer(self, user_answer):
-        return user_answer.to_lower() == self.answer
+        return user_answer.lower() == self.answer
 
 
 class Game(models.Model):
