@@ -27,9 +27,15 @@ class Point(models.Model):
         return user_answer.lower() == self.answer
 
 
+class Cluster(models.Model):
+    start = models.ForeignKey(Point,  related_name='cluster_point_start', on_delete=models.CASCADE)
+    finish = models.ForeignKey(Point,  related_name='cluster_point_finish',  on_delete=models.CASCADE)
+    points = models.ManyToManyField(Point)
+
+
 class Game(models.Model):
     name = models.TextField(verbose_name=_('Name'))
-    points = models.ManyToManyField(Point)
+    clusters = models.ManyToManyField(Cluster)
 
     class Meta:
         verbose_name = _("Game")
@@ -37,7 +43,7 @@ class Game(models.Model):
         ordering = ['-id']
 
 
-class Result(models.Model):
+class ResultPoint(models.Model):
     point = models.ForeignKey(Point, on_delete=models.CASCADE)
     time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
     user_answer = models.TextField(verbose_name=_('User Answer'), null=True)
@@ -47,7 +53,16 @@ class Result(models.Model):
     is_checked_correctly = models.BooleanField(verbose_name=_('Is Checked Correctly'), default=False)
 
 
+class ResultCluster(models.Model):
+    cluster = models.ForeignKey(Point, on_delete=models.CASCADE)
+    time_start = models.DateTimeField(verbose_name=_('Time Start'))
+    time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
+    scores = models.IntegerField(verbose_name=_('Scores'))
+
+
 class CurrentGame(models.Model):
     source_game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    results = models.ManyToManyField(Result)
+    results = models.ManyToManyField(ResultCluster)
     time_start = models.DateTimeField(verbose_name=_('Time Start'))
+    time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
+    scores = models.IntegerField(verbose_name=_('Scores'))
