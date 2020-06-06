@@ -1,0 +1,59 @@
+{
+  "name": "Test Game",
+  "clusters": [
+    {
+      "start": [12.1, 12.2],
+      "finish": [12.3, 12.2],
+      "points": [
+        {
+          "lat": 12.11,
+          "lon": 12.55,
+          "question": "How are you?",
+          "answer": "fine",
+          "tip": "wtf"
+        },
+        {
+          "lat": 12.11,
+          "lon": 12.55,
+          "question": "How are you?",
+          "answer": "fine",
+          "tip": "wtf"
+        },
+        {
+          "lat": 12.11,
+          "lon": 12.55,
+          "question": "How are you?",
+          "answer": "fine",
+          "tip": "wtf"
+        }
+      ]
+    },
+    {
+      "start": [12.1, 12.2],
+      "finish": [12.3, 12.2],
+      "points": [
+        {
+          "lat": 12.11,
+          "lon": 12.55,
+          "question": "How are you?",
+          "answer": "fine",
+          "tip": "wtf"
+        },
+        {
+          "lat": 12.11,
+          "lon": 12.55,
+          "question": "How are you?",
+          "answer": "fine",
+          "tip": "wtf"
+        },
+        {
+          "lat": 12.11,
+          "lon": 12.55,
+          "question": "How are you?",
+          "answer": "fine",
+          "tip": "wtf"
+        }
+      ]
+    }
+  ]
+}

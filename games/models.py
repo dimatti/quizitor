@@ -26,11 +26,28 @@ class Point(models.Model):
     def check_answer(self, user_answer):
         return user_answer.lower() == self.answer
 
+    @classmethod
+    def new_point(cls, lat, lon, is_node=False, question="", answer="", tip=""):
+        p = Point(lat=lat, lon=lon, is_node=is_node, question=question, answer=answer, tip=tip)
+        p.save()
+        return p
+
 
 class Cluster(models.Model):
     start = models.ForeignKey(Point,  related_name='cluster_point_start', on_delete=models.CASCADE)
     finish = models.ForeignKey(Point,  related_name='cluster_point_finish',  on_delete=models.CASCADE)
     points = models.ManyToManyField(Point)
+
+    @classmethod
+    def new_cluster(cls, data):
+        start = Point.new_point(data["start"]["lat"], data["start"]["lon"], is_node=True)
+        finish = Point.new_point(data["start"]["lat"], data["start"]["lon"], is_node=True)
+        c = Cluster(start=start, finish=finish)
+        points_data = data["points"]
+        for p in points_data:
+            c.points.add(Point.new_point(p["lat"], p["lon"], is_node=False, question=p["question"], answer=p["answer"], tip=p["tip"]))
+        c.save()
+        return c
 
 
 class Game(models.Model):
