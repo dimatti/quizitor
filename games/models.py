@@ -40,9 +40,10 @@ class Cluster(models.Model):
 
     @classmethod
     def new_cluster(cls, data):
-        start = Point.new_point(data["start"]["lat"], data["start"]["lon"], is_node=True)
-        finish = Point.new_point(data["start"]["lat"], data["start"]["lon"], is_node=True)
+        start = Point.new_point(data["start"][0], data["start"][1], is_node=True)
+        finish = Point.new_point(data["start"][0], data["start"][1], is_node=True)
         c = Cluster(start=start, finish=finish)
+        c.save()
         points_data = data["points"]
         for p in points_data:
             c.points.add(Point.new_point(p["lat"], p["lon"], is_node=False, question=p["question"], answer=p["answer"], tip=p["tip"]))
@@ -59,6 +60,14 @@ class Game(models.Model):
         verbose_name_plural = _("Games")
         ordering = ['-id']
 
+    @classmethod
+    def new_game(cls, data):
+        g = Game(name=data["name"])
+        g.save()
+        for cluster in data["clusters"]:
+            g.clusters.add(Cluster.new_cluster(cluster))
+        g.save()
+        return g
 
 class ResultPoint(models.Model):
     point = models.ForeignKey(Point, on_delete=models.CASCADE)
