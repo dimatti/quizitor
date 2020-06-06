@@ -67,5 +67,6 @@ class AnimalTestCase(TestCase):
 
     def test_game_creation(self):
         g = Game.new_game(data)
+        self.assertEqual(len(g.clusters.all()), 2)
         for cluster in g.clusters.all():
-            print(cluster.points.all())
+            self.assertEqual(len(cluster.points.all()), 3)
