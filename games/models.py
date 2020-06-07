@@ -15,6 +15,8 @@ class Point(models.Model):
     answer = models.TextField(verbose_name=_('Answer'), null=True)
     tip = models.TextField(verbose_name=_('Tip'), null=True)
 
+    objects = models.Manager()
+
     def get_distance(self, lat_user, lon_user):
         geodesic = pyproj.Geod(ellps='WGS84')
         return geodesic.inv(lat_user, lon_user, self.lat, self.lon)
@@ -38,6 +40,8 @@ class Cluster(models.Model):
     finish = models.ForeignKey(Point,  related_name='cluster_point_finish',  on_delete=models.CASCADE)
     points = models.ManyToManyField(Point)
 
+    objects = models.Manager()
+
     @classmethod
     def new_cluster(cls, data):
         start = Point.new_point(data["start"][0], data["start"][1], is_node=True)
@@ -54,6 +58,8 @@ class Cluster(models.Model):
 class Game(models.Model):
     name = models.TextField(verbose_name=_('Name'))
     clusters = models.ManyToManyField(Cluster)
+
+    objects = models.Manager()
 
     class Meta:
         verbose_name = _("Game")
@@ -78,6 +84,8 @@ class ResultPoint(models.Model):
     is_help_used = models.BooleanField(verbose_name=_('Is Help Used'), default=False)
     is_checked_correctly = models.BooleanField(verbose_name=_('Is Checked Correctly'), default=False)
 
+    objects = models.Manager()
+
 
 class ResultCluster(models.Model):
     cluster = models.ForeignKey(Point, on_delete=models.CASCADE)
@@ -85,10 +93,18 @@ class ResultCluster(models.Model):
     time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
     scores = models.IntegerField(verbose_name=_('Scores'))
 
+    objects = models.Manager()
+
 
 class CurrentGame(models.Model):
     source_game = models.ForeignKey(Game, on_delete=models.CASCADE)
     results = models.ManyToManyField(ResultCluster)
     time_start = models.DateTimeField(verbose_name=_('Time Start'))
-    time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
-    scores = models.IntegerField(verbose_name=_('Scores'))
+    time_completed = models.DateTimeField(verbose_name=_('Time Completed'), null=True)
+    scores = models.IntegerField(verbose_name=_('Scores'), default=0)
+
+    objects = models.Manager()
+
+    def next_cluster(self):
+        pass
+

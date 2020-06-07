@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 
 from authentication.views import UserAuthorization
+from games.views import CurrentGameInitView
 from users.views import UserView
 
 urlpatterns = [
@@ -24,4 +25,5 @@ urlpatterns = [
     path('login/', UserAuthorization.as_view()),
     path('users/', UserView.as_view()),
     path('users/<int:pk>', UserView.as_view()),
+    path('games/init/<int:pk>', CurrentGameInitView.as_view())
 ]
