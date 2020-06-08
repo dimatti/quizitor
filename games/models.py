@@ -112,6 +112,10 @@ class ResultPoint(models.Model):
         self.save()
         return tip
 
+    def get_distance(self, lat, lon):
+        return self.point.get_distance(lat, lon)
+
+
 class ResultCluster(models.Model):
     cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
     time_start = models.DateTimeField(verbose_name=_('Time Start'))
@@ -129,6 +133,16 @@ class ResultCluster(models.Model):
             rc.results.add(rp)
         rc.save()
         return rc
+
+    def get_points_info(self, lat, lon):
+        results = []
+        for point in self.results:
+            results.append(point.get_distance(lat, lon))
+        return results
+
+    def get_cluster_info(self):
+        response = {}
+
 
 
 class CurrentGame(models.Model):
