@@ -75,6 +75,7 @@ class Game(models.Model):
         g.save()
         return g
 
+
 class ResultPoint(models.Model):
     point = models.ForeignKey(Point, on_delete=models.CASCADE)
     time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
@@ -88,11 +89,11 @@ class ResultPoint(models.Model):
 
 
 class ResultCluster(models.Model):
-    cluster = models.ForeignKey(Point, on_delete=models.CASCADE)
+    cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
     time_start = models.DateTimeField(verbose_name=_('Time Start'))
     time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
     scores = models.IntegerField(verbose_name=_('Scores'))
-
+    results = models.ManyToManyField(ResultPoint)
     objects = models.Manager()
 
 
@@ -106,5 +107,9 @@ class CurrentGame(models.Model):
     objects = models.Manager()
 
     def next_cluster(self):
-        pass
+        original_clusters = self.source_game.clasters.all()
+        results = self.results.all()
+        if len(results) < len(original_clusters):
+            result = ResultCluster()
+
 
