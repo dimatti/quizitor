@@ -95,6 +95,22 @@ class ResultPoint(models.Model):
         rp.save()
         return rp
 
+    def check_point(self, lat, lon):
+        res = self.point.check_point(lat, lon)
+        self.is_checked_correctly = res
+        self.save()
+        return res
+
+    def check_answer(self, answer):
+        self.user_answer = answer
+        self.is_answered_correctly = self.point.check_answer(answer)
+        return self.is_answered_correctly
+
+    def get_tip(self):
+        tip = self.point.tip
+        self.is_tip_used = True
+        self.save()
+        return tip
 
 class ResultCluster(models.Model):
     cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
