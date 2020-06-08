@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 # Create your models here.
@@ -78,7 +80,7 @@ class Game(models.Model):
 
 class ResultPoint(models.Model):
     point = models.ForeignKey(Point, on_delete=models.CASCADE)
-    time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
+    time_completed = models.DateTimeField(verbose_name=_('Time Completed'), null=True)
     user_answer = models.TextField(verbose_name=_('User Answer'), null=True)
     is_answered_correctly = models.BooleanField(verbose_name=_('Is Answered Correctly'), default=False)
     is_tip_used = models.BooleanField(verbose_name=_('Is Tip Used'), default=False)
@@ -87,14 +89,30 @@ class ResultPoint(models.Model):
 
     objects = models.Manager()
 
+    @classmethod
+    def new_result_point(cls, point):
+        rp = ResultPoint(point=point)
+        rp.save()
+        return rp
+
 
 class ResultCluster(models.Model):
     cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
     time_start = models.DateTimeField(verbose_name=_('Time Start'))
-    time_completed = models.DateTimeField(verbose_name=_('Time Completed'))
+    time_completed = models.DateTimeField(verbose_name=_('Time Completed'), null=True)
     scores = models.IntegerField(verbose_name=_('Scores'))
     results = models.ManyToManyField(ResultPoint)
     objects = models.Manager()
+
+    @classmethod
+    def new_result_cluster(cls, cluster):
+        rc = ResultCluster(cluster=cluster, time_start=datetime.now(), scores=0)
+        rc.save()
+        for p in cluster.points.all():
+            rp = ResultPoint.new_result_point(p)
+            rc.results.add(rp)
+        rc.save()
+        return rc
 
 
 class CurrentGame(models.Model):
@@ -110,6 +128,10 @@ class CurrentGame(models.Model):
         original_clusters = self.source_game.clasters.all()
         results = self.results.all()
         if len(results) < len(original_clusters):
-            result = ResultCluster()
+            result = ResultCluster.new_result_cluster(original_clusters[len(results)])
+            self.source_game.clasters.add(result)
+            return result
+        return None
 
-
+    def current_cluster(self):
+        return self.results.all()[-1]
