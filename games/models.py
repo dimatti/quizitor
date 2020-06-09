@@ -115,6 +115,9 @@ class ResultPoint(models.Model):
     def get_distance(self, lat, lon):
         return self.point.get_distance(lat, lon)
 
+    def get_real_point_info(self):
+        return self.point.lat, self.point.lon
+
 
 class ResultCluster(models.Model):
     cluster = models.ForeignKey(Cluster, on_delete=models.CASCADE)
@@ -140,9 +143,9 @@ class ResultCluster(models.Model):
             results.append(point.get_distance(lat, lon))
         return results
 
-    def get_cluster_info(self):
-        response = {}
-
+    # def get_cluster_info(self):
+    #     response = {}
+    #     for
 
 
 class CurrentGame(models.Model):
@@ -165,3 +168,4 @@ class CurrentGame(models.Model):
 
     def current_cluster(self):
         return self.results.all()[-1]
+
