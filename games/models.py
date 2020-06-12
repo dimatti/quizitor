@@ -181,6 +181,33 @@ class ResultCluster(models.Model):
             i += 1
         return results
 
+    def close_cluster(self, forced=False):
+        status = self.get_status()
+        scores = 0
+        for index in status:
+            s = status[index]
+            if s["time_completed"] is None:
+                if forced:
+                    return 0
+                return None
+            scores += get_score(s)
+        scores += 100 - (datetime.now() - self.time_start).seconds//60
+        self.time_completed = datetime.now()
+        self.scores = scores
+        self.save()
+        return scores
+
+
+def get_score(status):
+    score = 0
+    if status["is_answered_correctly"]:
+        score += 5
+    if not status["is_tip_used"]:
+        score += 5
+    if not status["is_help_used"]:
+        score += 5
+    return score
+
 
 class CurrentGame(models.Model):
     source_game = models.ForeignKey(Game, on_delete=models.CASCADE)
