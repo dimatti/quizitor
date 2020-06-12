@@ -1,6 +1,6 @@
 from django.test import TestCase
-
-from games.models import Game
+from datetime import datetime
+from games.models import Game, CurrentGame
 
 data = {
   "name": "Test Game",
@@ -85,7 +85,7 @@ data2 = {
         },
         {
           "lat": 55.760424,
-          "lon": 7.597819,
+          "lon": 37.597819,
           "question": "Назовите фамилию писателя, который жил здесь",
           "answer": "Горький",
           "tip": "На дне"
@@ -126,7 +126,7 @@ data2 = {
         {
           "lat": 55.743893,
           "lon": 37.596727,
-          "question": "Какая старана представлена этим посольством",
+          "question": "Какая страна представлена этим посольством",
           "answer": "Люксенбург",
           "tip": "Роза"
         },
@@ -156,3 +156,17 @@ class AnimalTestCase(TestCase):
         self.assertEqual(len(g.clusters.all()), 2)
         for cluster in g.clusters.all():
             self.assertEqual(len(cluster.points.all()), 3)
+
+    def test_current_game(self):
+        g = Game.new_game(data2)
+        cg = CurrentGame(source_game=g, time_start=datetime.now())
+        cg.save()
+        c = cg.next_cluster()
+        c1 = cg.current_cluster()
+        print(c1.check_point(0, 55.761752, 37.602939))
+        print(c1.get_status())
+        print(c1.get_question(0))
+        print(c1.get_tip(0))
+        print(c1.get_status())
+        print(c1.check_answer(0, "МХАТ"))
+        print(c1.get_status())

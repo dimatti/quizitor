@@ -28,7 +28,7 @@ class Point(models.Model):
         return abs(distance) < DISTANCE
 
     def check_answer(self, user_answer):
-        return user_answer.lower() == self.answer
+        return user_answer.lower() == self.answer.lower()
 
     @classmethod
     def new_point(cls, lat, lon, is_node=False, question="", answer="", tip=""):
@@ -85,8 +85,7 @@ class ResultPoint(models.Model):
     is_answered_correctly = models.BooleanField(verbose_name=_('Is Answered Correctly'), default=False)
     is_tip_used = models.BooleanField(verbose_name=_('Is Tip Used'), default=False)
     is_help_used = models.BooleanField(verbose_name=_('Is Help Used'), default=False)
-    is_checked_correctly = models.BooleanField(verbose_name=_('Is Checked Correctly'), default=False)
-
+    is_checked = models.BooleanField(verbose_name=_('Is Checked'), default=False)
     objects = models.Manager()
 
     @classmethod
@@ -97,13 +96,15 @@ class ResultPoint(models.Model):
 
     def check_point(self, lat, lon):
         res = self.point.check_point(lat, lon)
-        self.is_checked_correctly = res
+        self.is_checked = res
         self.save()
         return res
 
     def check_answer(self, answer):
         self.user_answer = answer
         self.is_answered_correctly = self.point.check_answer(answer)
+        self.time_completed = datetime.now()
+        self.save()
         return self.is_answered_correctly
 
     def get_tip(self):
@@ -117,6 +118,13 @@ class ResultPoint(models.Model):
 
     def get_real_point_info(self):
         return self.point.lat, self.point.lon
+
+    def get_status(self):
+        return {"is_answered_correctly": self.is_answered_correctly,
+                "is_help_used": self.is_answered_correctly,
+                "is_tip_used": self.is_tip_used,
+                "time_completed": self.time_completed,
+                "is_checked": self.is_checked}
 
 
 class ResultCluster(models.Model):
@@ -138,14 +146,40 @@ class ResultCluster(models.Model):
         return rc
 
     def get_points_info(self, lat, lon):
-        results = []
-        for point in self.results:
-            results.append(point.get_distance(lat, lon))
+        results = {}
+        i = 0
+        for point in self.results.all():
+            results[i] = point.get_distance(lat, lon)
+            i += 1
         return results
 
-    # def get_cluster_info(self):
-    #     response = {}
-    #     for
+    def check_point(self, index, lat, lon):
+        points = self.results.all()
+        result = points[index].check_point(lat, lon)
+        return result
+
+    def check_answer(self, index, answer):
+        points = self.results.all()
+        result = points[index].check_answer(answer)
+        return result
+
+    def get_question(self, index):
+        points = self.results.all()
+        result = points[index].point.question
+        return result
+
+    def get_tip(self, index):
+        points = self.results.all()
+        result = points[index].get_tip()
+        return result
+
+    def get_status(self):
+        results = {}
+        i = 0
+        for point in self.results.all():
+            results[i] = point.get_status()
+            i += 1
+        return results
 
 
 class CurrentGame(models.Model):
@@ -158,14 +192,16 @@ class CurrentGame(models.Model):
     objects = models.Manager()
 
     def next_cluster(self):
-        original_clusters = self.source_game.clasters.all()
+        original_clusters = self.source_game.clusters.all()
         results = self.results.all()
         if len(results) < len(original_clusters):
             result = ResultCluster.new_result_cluster(original_clusters[len(results)])
-            self.source_game.clasters.add(result)
+            self.results.add(result)
             return result
         return None
 
     def current_cluster(self):
-        return self.results.all()[-1]
+        if len(self.results.all()) > 0:
+            return self.results.all()[len(self.results.all())-1]
+        return None
 
