@@ -116,12 +116,14 @@ class ResultPoint(models.Model):
     def get_distance(self, lat, lon):
         return self.point.get_distance(lat, lon)
 
-    def get_real_point_info(self):
+    def get_help(self):
+        self.is_help_used = True
+        self.save()
         return self.point.lat, self.point.lon
 
     def get_status(self):
         return {"is_answered_correctly": self.is_answered_correctly,
-                "is_help_used": self.is_answered_correctly,
+                "is_help_used": self.is_help_used,
                 "is_tip_used": self.is_tip_used,
                 "time_completed": self.time_completed,
                 "is_checked": self.is_checked}
@@ -158,6 +160,11 @@ class ResultCluster(models.Model):
         result = points[index].check_point(lat, lon)
         return result
 
+    def get_help(self, index):
+        points = self.results.all()
+        result = points[index].get_help()
+        return result
+
     def check_answer(self, index, answer):
         points = self.results.all()
         result = points[index].check_answer(answer)
@@ -186,22 +193,30 @@ class ResultCluster(models.Model):
         scores = 0
         for index in status:
             s = status[index]
-            if s["time_completed"] is None:
+            if not s["is_checked"]:
                 if forced:
                     return 0
                 return None
-            scores += get_score(s)
-        scores += 100 - (datetime.now() - self.time_start).seconds//60
+            scores += get_point_score(s)
+        scores += get_time_score(self.time_start)
         self.time_completed = datetime.now()
         self.scores = scores
         self.save()
         return scores
 
 
-def get_score(status):
+def get_time_score(time_start):
+    result = 100 - (datetime.now().replace(tzinfo=None) - time_start.replace(tzinfo=None)).seconds
+    if result < 0:
+        return 0
+    return result
+
+
+def get_point_score(status):
     score = 0
-    if status["is_answered_correctly"]:
-        score += 5
+    if not status["is_answered_correctly"]:
+        return 0
+    score += 5
     if not status["is_tip_used"]:
         score += 5
     if not status["is_help_used"]:
@@ -232,3 +247,8 @@ class CurrentGame(models.Model):
             return self.results.all()[len(self.results.all())-1]
         return None
 
+    def close_current_game(self):
+        scores = 0
+        for cluster in self.results.all():
+            scores += cluster.scores
+        self.time_completed = datetime.now()

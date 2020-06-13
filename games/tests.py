@@ -1,3 +1,5 @@
+import time
+
 from django.test import TestCase
 from datetime import datetime
 from games.models import Game, CurrentGame
@@ -106,8 +108,8 @@ data2 = {
         {
           "lat": 55.752955,
           "lon": 37.603355,
-          "question": "Чей это дом?",
-          "answer": "Морозова",
+          "question": "Назовите фамилию владельца этого дома?",
+          "answer": "Морозов",
           "tip": "Савва"
         },
         {
@@ -163,10 +165,45 @@ class AnimalTestCase(TestCase):
         cg.save()
         c = cg.next_cluster()
         c1 = cg.current_cluster()
+
+        print("FIRST POINT") #10
         print(c1.check_point(0, 55.761752, 37.602939))
-        print(c1.get_status())
         print(c1.get_question(0))
         print(c1.get_tip(0))
-        print(c1.get_status())
         print(c1.check_answer(0, "МХАТ"))
-        print(c1.get_status())
+        print(c1.get_status()[0])
+
+        print("SECOND POINT") #0
+        print(c1.check_point(1, 55.760424, 37.597819))
+        print(c1.get_question(1))
+        print(c1.check_answer(1, "МХАТ"))
+        print(c1.get_status()[1])
+
+        print("THIRD POINT")
+        lat, lon = c1.get_help(2) #10
+        print(c1.check_point(2, lat, lon))
+        print(c1.get_question(2))
+        print(c1.check_answer(2, "Горький"))
+        print(c1.get_status()[2])
+
+        time.sleep(5)
+        print(c1.close_cluster())
+
+        print("2 - SECOND POINT")  # 0
+        c2 = cg.next_cluster()
+        lat, lon = c2.get_help(1)
+        print(c2.check_point(1, lat, lon))
+        print(c2.get_question(1))
+        print(c2.check_answer(1, "моРозов"))
+        print(c2.get_status()[1])
+
+        print("2 - THIRD POINT")  # 0
+        lat, lon = c2.get_help(2)
+        print(c2.check_point(2, lat, lon))
+        print(c2.get_question(2))
+        print(c2.check_answer(2, "моРозов"))
+        print(c2.get_status()[2])
+
+        time.sleep(10)
+        print(c2.close_cluster())
+        print(c2.close_cluster(forced=True))
