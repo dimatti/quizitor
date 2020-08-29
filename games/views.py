@@ -22,14 +22,11 @@ class CurrentGameInitView(APIView):
 class MiniGameViewSet(viewsets.ViewSet):
     queryset = Cluster.objects.all()
 
-    @action(detail=False, methods=["POST", "GET"])
+    @action(detail=False, methods=["POST"])
     def set_data(self, request):
-        if request.method == 'POST':
-            data = request.data
-            cluster = Cluster.new_cluster(data=data)
-            return Response({"id": cluster.pk})
-        else:
-            return Response({})
+        data = request.data
+        cluster = Cluster.new_cluster(data=data)
+        return Response({"id": cluster.pk})
 
     @action(detail=False, methods=["POST"])
     def start_game(self, request):
@@ -37,3 +34,20 @@ class MiniGameViewSet(viewsets.ViewSet):
         id = data["id"]
         cluster = ResultCluster.new_result_cluster(Cluster.objects.get(pk=id))
         return Response(cluster.get_status())
+
+    @action(detail=False, methods=["POST"])
+    def get_status(self, request):
+        data = request.data
+        id = data["id"]
+        cluster = ResultCluster.objects.get(pk=id)
+        return Response(cluster.get_status())
+
+    @action(detail=False, methods=["POST"])
+    def check(self, request):
+        data = request.data
+        id = data["id"]
+        lat = data["lat"]
+        lon = data["lon"]
+        cluster = ResultCluster.objects.get(pk=id)
+        result, index = cluster.check_points(lat, lon)
+        return Response({"point": index, "result": result})
