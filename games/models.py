@@ -38,8 +38,8 @@ class Point(models.Model):
 
 
 class Cluster(models.Model):
-    start = models.ForeignKey(Point,  related_name='cluster_point_start', on_delete=models.CASCADE)
-    finish = models.ForeignKey(Point,  related_name='cluster_point_finish',  on_delete=models.CASCADE)
+    start = models.ForeignKey(Point, related_name='cluster_point_start', on_delete=models.CASCADE)
+    finish = models.ForeignKey(Point, related_name='cluster_point_finish', on_delete=models.CASCADE)
     points = models.ManyToManyField(Point)
 
     objects = models.Manager()
@@ -52,7 +52,8 @@ class Cluster(models.Model):
         c.save()
         points_data = data["points"]
         for p in points_data:
-            c.points.add(Point.new_point(p["lat"], p["lon"], is_node=False, question=p["question"], answer=p["answer"], tip=p["tip"]))
+            c.points.add(Point.new_point(p["lat"], p["lon"], is_node=False, question=p["question"], answer=p["answer"],
+                                         tip=p["tip"]))
         c.save()
         return c
 
@@ -96,8 +97,9 @@ class ResultPoint(models.Model):
 
     def check_point(self, lat, lon):
         res = self.point.check_point(lat, lon)
-        self.is_checked = res
-        self.save()
+        if res:
+            self.is_checked = res
+            self.save()
         return res
 
     def check_answer(self, answer):
@@ -122,11 +124,15 @@ class ResultPoint(models.Model):
         return self.point.lat, self.point.lon
 
     def get_status(self):
-        return {"is_answered_correctly": self.is_answered_correctly,
-                "is_help_used": self.is_help_used,
-                "is_tip_used": self.is_tip_used,
-                "time_completed": self.time_completed,
-                "is_checked": self.is_checked}
+        status = {"is_answered_correctly": self.is_answered_correctly,
+                  "is_help_used": self.is_help_used,
+                  "is_tip_used": self.is_tip_used,
+                  "time_completed": self.time_completed,
+                  "is_checked": self.is_checked,
+                  "coordinates": {}}
+        if self.is_checked:
+            status["coordinates"] = {"lat": self.point.lat, "lon": self.point.lon}
+        return status
 
 
 class ResultCluster(models.Model):
@@ -160,6 +166,13 @@ class ResultCluster(models.Model):
         result = points[index].check_point(lat, lon)
         return result
 
+    def check_points(self, lat, lon):
+        points = self.results.all()
+        for i in range(len(points)):
+            if points[i].check_point(lat, lon):
+                return True, i
+        return False, -1
+
     def get_help(self, index):
         points = self.results.all()
         result = points[index].get_help()
@@ -181,7 +194,8 @@ class ResultCluster(models.Model):
         return result
 
     def get_status(self):
-        results = {}
+        results = {"id": self.pk, "start": {"lat": self.cluster.start.lat, "lon": self.cluster.start.lon},
+                   "finish": {"lat": self.cluster.finish.lat, "lon": self.cluster.finish.lon}}
         i = 0
         for point in self.results.all():
             results[i] = point.get_status()
@@ -244,7 +258,7 @@ class CurrentGame(models.Model):
 
     def current_cluster(self):
         if len(self.results.all()) > 0:
-            return self.results.all()[len(self.results.all())-1]
+            return self.results.all()[len(self.results.all()) - 1]
         return None
 
     def close_current_game(self):
