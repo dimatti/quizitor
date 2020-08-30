@@ -197,9 +197,11 @@ class ResultCluster(models.Model):
         results = {"id": self.pk, "start": {"lat": self.cluster.start.lat, "lon": self.cluster.start.lon},
                    "finish": {"lat": self.cluster.finish.lat, "lon": self.cluster.finish.lon}}
         i = 0
+        points = []
         for point in self.results.all():
-            results[i] = point.get_status()
+            points.append(point.get_status())
             i += 1
+            results["points"] = points
         return results
 
     def close_cluster(self, forced=False):
