@@ -43,6 +43,15 @@ class MiniGameViewSet(viewsets.ViewSet):
         return Response(cluster.get_status())
 
     @action(detail=False, methods=["POST"])
+    def get_distances(self, request):
+        data = request.data
+        id = data["id"]
+        lat = data["lat"]
+        lon = data["lon"]
+        cluster = ResultCluster.objects.get(pk=id)
+        return Response(cluster.get_points_info(lat, lon))
+
+    @action(detail=False, methods=["POST"])
     def check(self, request):
         data = request.data
         id = data["id"]

@@ -154,10 +154,11 @@ class ResultCluster(models.Model):
         return rc
 
     def get_points_info(self, lat, lon):
-        results = {}
+        results = {"points":[]}
         i = 0
         for point in self.results.all():
-            results[i] = point.get_distance(lat, lon)
+            f_az, b_az, d = point.get_distance(lat, lon)
+            results["points"].append({"f_az": f_az, "b_az": b_az, "distance": d})
             i += 1
         return results
 
