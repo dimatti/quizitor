@@ -49,5 +49,5 @@ class MiniGameViewSet(viewsets.ViewSet):
         lat = data["lat"]
         lon = data["lon"]
         cluster = ResultCluster.objects.get(pk=id)
-        result, index = cluster.check_points(lat, lon)
-        return Response({"point": index, "result": result})
+        result, index, lat, lon = cluster.check_points(lat, lon)
+        return Response({"point": index, "result": result, "lat": lat, "lon": lon})

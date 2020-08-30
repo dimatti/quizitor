@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import pyproj
 
-DISTANCE = 10.0
+DISTANCE = 50.0
 
 
 class Point(models.Model):
@@ -170,8 +170,8 @@ class ResultCluster(models.Model):
         points = self.results.all()
         for i in range(len(points)):
             if points[i].check_point(lat, lon):
-                return True, i
-        return False, -1
+                return True, i, points[i].point.lat, points[i].point.lon
+        return False, -1, 0, 0
 
     def get_help(self, index):
         points = self.results.all()
