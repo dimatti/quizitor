@@ -47,7 +47,7 @@ class Cluster(models.Model):
     @classmethod
     def new_cluster(cls, data):
         start = Point.new_point(data["start"][0], data["start"][1], is_node=True)
-        finish = Point.new_point(data["start"][0], data["start"][1], is_node=True)
+        finish = Point.new_point(data["finish"][0], data["finish"][1], is_node=True)
         c = Cluster(start=start, finish=finish)
         c.save()
         points_data = data["points"]
