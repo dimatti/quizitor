@@ -65,26 +65,27 @@ class MiniGameViewSet(viewsets.ViewSet):
     def get_question(self, request):
         data = request.data
         id = data["id"]
-        num = data["num"]
+        index = data["index"]
         cluster = ResultCluster.objects.get(pk=id)
-        question = cluster.get_question(num)
-        return Response({"question": question})
+        question = cluster.get_question(index)
+        tip = cluster.get_tip(index)
+        return Response({"question": question, "tip": tip})
 
     @action(detail=False, methods=["POST"])
     def get_tip(self, request):
         data = request.data
         id = data["id"]
-        num = data["num"]
+        index = data["index"]
         cluster = ResultCluster.objects.get(pk=id)
-        tip = cluster.get_tip(num)
+        tip = cluster.get_tip(index)
         return Response({"tip": tip})
 
     @action(detail=False, methods=["POST"])
     def check_answer(self, request):
         data = request.data
         id = data["id"]
-        num = data["num"]
+        index = data["index"]
         answer = data["answer"]
         cluster = ResultCluster.objects.get(pk=id)
-        question = cluster.check_answer(num, answer)
-        return Response({"question": question})
+        question = cluster.check_answer(index, answer)
+        return Response({"result": question})
