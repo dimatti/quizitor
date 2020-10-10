@@ -60,3 +60,31 @@ class MiniGameViewSet(viewsets.ViewSet):
         cluster = ResultCluster.objects.get(pk=id)
         result, index, lat, lon = cluster.check_points(lat, lon)
         return Response({"point": index, "result": result, "lat": lat, "lon": lon})
+
+    @action(detail=False, methods=["POST"])
+    def get_question(self, request):
+        data = request.data
+        id = data["id"]
+        num = data["num"]
+        cluster = ResultCluster.objects.get(pk=id)
+        question = cluster.get_question(num)
+        return Response({"question": question})
+
+    @action(detail=False, methods=["POST"])
+    def get_tip(self, request):
+        data = request.data
+        id = data["id"]
+        num = data["num"]
+        cluster = ResultCluster.objects.get(pk=id)
+        tip = cluster.get_tip(num)
+        return Response({"tip": tip})
+
+    @action(detail=False, methods=["POST"])
+    def check_answer(self, request):
+        data = request.data
+        id = data["id"]
+        num = data["num"]
+        answer = data["answer"]
+        cluster = ResultCluster.objects.get(pk=id)
+        question = cluster.check_answer(num, answer)
+        return Response({"question": question})
