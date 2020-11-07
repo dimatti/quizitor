@@ -124,15 +124,30 @@ class ResultPoint(models.Model):
         return self.point.lat, self.point.lon
 
     def get_status(self):
-        status = {"is_answered_correctly": self.is_answered_correctly,
-                  "is_help_used": self.is_help_used,
-                  "is_tip_used": self.is_tip_used,
-                  "time_completed": self.time_completed,
-                  "is_checked": self.is_checked,
-                  "coordinates": {}}
-        if self.is_checked:
-            status["coordinates"] = {"lat": self.point.lat, "lon": self.point.lon}
+        status = {
+            "coordinates": {"lat": self.point.lat, "lon": self.point.lon},
+            "question": self.point.question,
+            "answer": self.point.answer,
+            "tip": self.point.tip,
+            "is_checked": self.is_checked,
+            "is_answered_correctly": self.is_answered_correctly,
+            "is_help_used": self.is_help_used,
+            "is_tip_used": self.is_tip_used,
+            "time_completed": self.time_completed,
+        }
         return status
+
+    def update_info(self, is_checked=None, is_answered_correctly=None, is_tip_used=None, is_help_used=None):
+        if is_checked:
+            self.is_checked = True
+            self.time_completed = datetime.now()
+        if is_answered_correctly:
+            self.is_answered_correctly = True
+        if is_tip_used:
+            self.is_tip_used = True
+        if is_help_used:
+            self.is_help_used = True
+        self.save()
 
 
 class ResultCluster(models.Model):
@@ -204,6 +219,12 @@ class ResultCluster(models.Model):
             i += 1
             results["points"] = points
         return results
+
+    def update_info(self, index, is_checked=None, is_answered_correctly=None, is_tip_used=None, is_help_used=None):
+        points = self.results.all()
+        result = points[index].update_info(is_checked=is_checked, is_answered_correctly=is_answered_correctly,
+                                           is_tip_used=is_tip_used, is_help_used=is_help_used)
+        return result
 
     def close_cluster(self, forced=False):
         status = self.get_status()

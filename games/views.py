@@ -89,3 +89,17 @@ class MiniGameViewSet(viewsets.ViewSet):
         cluster = ResultCluster.objects.get(pk=id)
         question = cluster.check_answer(index, answer)
         return Response({"result": question})
+
+    @action(detail=False, methods=["POST"])
+    def update_info(self, request):
+        data = request.data
+        id = data["id"]
+        index = int(data["index"])
+        is_checked = data.get("is_checked")
+        is_answered_correctly = data.get("is_answered_correctly")
+        is_tip_used = data.get("is_tip_used")
+        is_help_used = data.get("is_help_used")
+        cluster = ResultCluster.objects.get(pk=id)
+        cluster.update_info(index, is_checked=is_checked, is_answered_correctly=is_answered_correctly,
+                                       is_tip_used=is_tip_used, is_help_used=is_help_used)
+        return Response({"result": "ok"})
