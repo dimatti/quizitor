@@ -102,4 +102,4 @@ class MiniGameViewSet(viewsets.ViewSet):
         cluster = ResultCluster.objects.get(pk=id)
         cluster.update_info(index, is_checked=is_checked, is_answered_correctly=is_answered_correctly,
                                        is_tip_used=is_tip_used, is_help_used=is_help_used)
-        return Response({"result": "ok"})
+        return Response({"result": True})
